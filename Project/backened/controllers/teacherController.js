@@ -16,7 +16,21 @@ exports.updateStatus = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const appointment = await Appointment.findByIdAndUpdate(id, { status }, { new: true }).populate("student");
+    // Find the appointment first
+    const appointment = await Appointment.findById(id).populate("student");
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Ensure only the assigned teacher can update
+    if (appointment.teacher.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized to update this appointment" });
+    }
+
+    // Update the status
+    appointment.status = status;
+    await appointment.save();
 
     // Email notification
     await transporter.sendMail({
@@ -31,3 +45,4 @@ exports.updateStatus = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+

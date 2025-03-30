@@ -1,21 +1,33 @@
 const User = require("../models/User");
-const transporter = require("../config/mail");
 
 exports.getPendingStudents = async (req, res) => {
-  const students = await User.find({ role: "student", status: "pending" });
-  res.json(students);
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    
+    const students = await User.find({ status: "pending" });
+    res.json(students);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
 exports.changeStatus = async (req, res) => {
-  const { status } = req.body;
-  const student = await User.findByIdAndUpdate(req.params.id, { status }, { new: true });
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: student.email,
-    subject: "Account Status Updated",
-    text: `Your registration has been ${status}.`,
-  });
+    const { status } = req.body;
+    if (!["approved", "denied"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
 
-  res.json({ message: `Student ${status}` });
+    const student = await User.findByIdAndUpdate(req.params.id, { status }, { new: true });
+
+    res.json({ message: `Student status changed to ${status}` });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
