@@ -7,7 +7,6 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
     role: "student", // Default role
   });
 
@@ -22,24 +21,26 @@ const Register = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+    
     if (!agree) {
       alert("Please agree to the terms.");
       return;
     }
-
+  
     try {
-      await API.post("/users/register", formData);
+      console.log("Submitting data:", formData); // Log form data
+  
+      const response = await API.post("/auth/register", formData);
+      
+      console.log("Registration response:", response.data); // Log response
       alert("Registration successful! Awaiting admin approval.");
       navigate("/login");
     } catch (error) {
-      alert("Registration failed.");
-      console.error(error);
+      console.error("Registration failed:", error.response?.data || error.message); // Log error
+      alert("Registration failed. Check the console for details.");
     }
   };
+  
 
   return (
     <section className="vh-100" style={{ backgroundColor: "#eee" }}>
@@ -97,20 +98,7 @@ const Register = () => {
                         </div>
                       </div>
 
-                      <div className="d-flex flex-row align-items-center mb-4">
-                        <i className="fas fa-key fa-lg me-3 fa-fw"></i>
-                        <div className="form-outline flex-fill mb-0">
-                          <input
-                            type="password"
-                            name="confirmPassword"
-                            className="form-control"
-                            placeholder="Repeat your password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            required
-                          />
-                        </div>
-                      </div>
+                      
 
                       <div className="d-flex flex-row align-items-center mb-4">
                         <i className="fas fa-user-graduate fa-lg me-3 fa-fw"></i>

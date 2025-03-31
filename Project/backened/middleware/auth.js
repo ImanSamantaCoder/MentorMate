@@ -8,18 +8,17 @@ const verifyToken = (req, res, next) => {
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET);
     req.user = verified; // ✅ Attach user data to request
-    res.send("hello");
-    next();
+    next(); // ✅ Continue execution
   } catch (err) {
-    res.status(400).json({ message: "Invalid Token" });
+    return res.status(400).json({ message: "Invalid Token" });
   }
 };
+
 const verifyAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") {
+  if (!req.user || req.user.role !== "admin") {
     return res.status(403).json({ message: "Admin access required" });
   }
   next();
 };
 
 module.exports = { verifyToken, verifyAdmin };
-

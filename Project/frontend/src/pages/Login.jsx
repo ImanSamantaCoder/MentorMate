@@ -12,20 +12,20 @@ const Login = () => {
     e.preventDefault();
   
     try {
-      const response = await fetch("http://localhost:5000/api/users/login", {  // Updated URL
+      const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: "include", // ✅ Important for cookies
       });
   
       const data = await response.json();
   
       if (response.ok) {
-        localStorage.setItem("token", data.token); // Store JWT token
         alert("Login successful!");
-        navigate("/dashboard"); // Redirect to dashboard
+        navigate("/start"); // Redirect to the dashboard
       } else {
         setError(data.message || "Invalid credentials");
       }

@@ -40,11 +40,11 @@ exports.login = async (req, res) => {
 
     // ✅ Store JWT in an HTTP-Only cookie
     res.cookie("token", token, {
-      httpOnly: true,  // ✅ Prevents XSS attacks
-      secure: process.env.NODE_ENV === "production", // ✅ HTTPS only in production
-      sameSite: "strict",  // ✅ Prevents CSRF attacks
-      maxAge: 24 * 60 * 60 * 1000, // ✅ 1 day expiration
+      httpOnly: true, // Prevents client-side access (security)
+      secure: false, // Set to `true` in production (HTTPS only)
+      sameSite: "Lax", // Allows sending cookies with same-site requests
     });
+  
 
     res.json({ message: "Login successful", user });
   } catch (err) {
