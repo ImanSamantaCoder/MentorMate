@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Start from "./pages/Start";
 import AdminDashboard from "./component/AdminDashBoard";
+import StudentDashboard from "./pages/StudentDashBoard";
 function App() {
   return (
     <Router>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/start" element={<Start />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/studentDashboard" element={<StudentDashboard/>} />
 
       </Routes>
 

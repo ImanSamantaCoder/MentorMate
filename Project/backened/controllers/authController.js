@@ -25,6 +25,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
+  console.log(password);
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: "User not found" });
@@ -32,7 +33,7 @@ exports.login = async (req, res) => {
     if (user.status !== "approved") {
       return res.status(403).json({ message: "Awaiting admin approval" });
     }
-
+    console.log(password,user.password);
     const validPass = await bcrypt.compare(password, user.password);
     if (!validPass) return res.status(401).json({ message: "Invalid Credentials" });
 

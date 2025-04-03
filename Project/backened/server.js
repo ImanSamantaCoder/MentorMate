@@ -3,6 +3,8 @@ const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const User = require("./models/User");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 
@@ -21,6 +23,32 @@ app.use(
 
 // DB Connection
 connectDB();
+const createAdmin = async () => {
+  try {
+    const existingTeacher = await User.findOne({ email: "arghya@example.com" });
+
+    if (!existingTeacher) {
+      const hashedPassword = await bcrypt.hash("arghya123", 10);
+      const admin = new User({
+        name: "arghya",
+        email: "arghya@example.com",
+        password: hashedPassword,
+        role: "teacher",
+        status:"approved",
+      });
+
+      await admin.save();
+      console.log("✅ teacher created successfully!");
+    } else {
+      console.log("⚠️ Teacher already exists.");
+    }
+  } catch (error) {
+    console.error("❌ Error creating admin:", error);
+  }
+};
+
+// Call admin creation function
+createAdmin();
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
