@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Start from "./pages/Start";
 import AdminDashboard from "./component/AdminDashBoard";
 import StudentDashboard from "./pages/StudentDashBoard";
+import TeacherDashboard from "./pages/TeacherDashboard";
 function App() {
   return (
     <Router>
@@ -23,6 +24,7 @@ function App() {
         <Route path="/start" element={<Start />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/studentDashboard" element={<StudentDashboard/>} />
+        <Route path="/TeacherDashboard" element={<TeacherDashboard/>} />
 
       </Routes>
 

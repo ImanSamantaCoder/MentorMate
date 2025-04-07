@@ -1,10 +1,13 @@
 const Appointment = require("../models/Appointment");
-const transporter = require("../config/mail");
+const sendMail = require("../config/mail"); // ✅ Corrected import
 
 exports.getPendingAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find({ teacher: req.user.id, status: "pending" })
-      .populate("student", "name email");
+    const appointments = await Appointment.find({
+      teacher: req.user.id,
+      status: "pending",
+    }).populate("student", "name email");
+
     res.json(appointments);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -16,7 +19,7 @@ exports.updateStatus = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Find the appointment first
+    // Find the appointment by ID and populate student
     const appointment = await Appointment.findById(id).populate("student");
 
     if (!appointment) {
@@ -28,21 +31,24 @@ exports.updateStatus = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized to update this appointment" });
     }
 
-    // Update the status
+    // Update status and save
     appointment.status = status;
     await appointment.save();
 
-    // Email notification
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: appointment.student.email,
-      subject: "Appointment Update",
-      text: `Your appointment has been ${status}.`,
-    });
+    // Try sending email notification
+    try {
+      await sendMail(
+        appointment.student.email,
+        "Appointment Update",
+        `Your appointment has been ${status}.`
+      );
+    } catch (emailErr) {
+      console.error("❌ Failed to send email:", emailErr.message);
+    }
 
     res.json({ message: `Appointment ${status}` });
   } catch (err) {
+    console.error("❌ Error in updating appointment:", err.message);
     res.status(400).json({ error: err.message });
   }
 };
-
